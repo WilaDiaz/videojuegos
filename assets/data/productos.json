@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "nombre": "Harry Potter",
+        "descripcion": "Vive una aventura mágica y explora el mundo de Harry Potter.",
+        "precio": 39990,
+        "categoria": "Aventura",
+        "imagen": "assets/img/harrypotter.avif"
+    },
+    {
+        "id": 2,
+        "nombre": "Los Sims 4",
+        "descripcion": "Crea personajes, construye hogares y disfruta diferentes historias.",
+        "precio": 29990,
+        "categoria": "Simulación",
+        "imagen": "assets/img/lossims.jpg"
+    },
+    {
+        "id": 3,
+        "nombre": "Mortal Kombat",
+        "descripcion": "Disfruta emocionantes combates y enfréntate a diferentes luchadores.",
+        "precio": 34990,
+        "categoria": "Combate",
+        "imagen": "assets/img/mortalkombat.avif"
+    }
+]
