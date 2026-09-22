@@ -53,6 +53,11 @@ function mostrarProductos(productos) {
                         <span class="badge text-bg-secondary mb-3">
                             ${producto.categoria}
                         </span>
+
+                        <button class="btn btn-primary mt-auto"
+                     onclick="agregarAlCarrito('${producto.nombre}', ${producto.precio})">
+                        Agregar al carrito
+                    </button>
                     </div>
                 </div>
             </div>
