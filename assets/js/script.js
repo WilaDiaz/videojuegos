@@ -64,6 +64,27 @@ function mostrarProductos(productos) {
         `;
     });
 }
+// Carrito de compras
+let carrito = [];
+let totalCarrito = 0;
+
+function agregarAlCarrito(nombre, precio) {
+    carrito.push({ nombre, precio });
+    totalCarrito += precio;
+
+    const listaCarrito = document.getElementById("lista-carrito");
+    const total = document.getElementById("total-carrito");
+
+    const item = document.createElement("li");
+    item.className = "list-group-item d-flex justify-content-between";
+    item.innerHTML = `
+        <span>${nombre}</span>
+        <span>$${precio.toLocaleString("es-CL")}</span>
+    `;
+
+    listaCarrito.appendChild(item);
+    total.textContent = totalCarrito.toLocaleString("es-CL");
+}
 
 // Ejecuta la carga de productos al iniciar la página
 cargarProductos();
