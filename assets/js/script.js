@@ -77,6 +77,7 @@ function agregarAlCarrito(nombre, precio) {
 
     const item = document.createElement("li");
     item.className = "list-group-item d-flex justify-content-between";
+
     item.innerHTML = `
         <span>${nombre}</span>
         <span>$${precio.toLocaleString("es-CL")}</span>
