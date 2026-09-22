@@ -1,6 +1,31 @@
 // Contenedor donde se mostrarán los productos
 const listaProductos = document.getElementById("lista-productos");
 
+// Buscador de productos
+const formularioBusqueda = document.getElementById("form-busqueda");
+const inputBusqueda = document.getElementById("busqueda");
+
+formularioBusqueda.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const texto = inputBusqueda.value.toLowerCase().trim();
+
+    try {
+        const respuesta = await fetch("assets/data/productos.json");
+        const productos = await respuesta.json();
+
+        const productosFiltrados = productos.filter(producto =>
+            producto.nombre.toLowerCase().includes(texto)
+        );
+
+        mostrarProductos(productosFiltrados);
+
+    } catch (error) {
+        console.error("Error al buscar productos:", error);
+    }
+});
+
+
 // Carga los productos desde el archivo JSON
 async function cargarProductos() {
     try {
@@ -63,7 +88,8 @@ function mostrarProductos(productos) {
             </div>
         `;
     });
-}
+
+
 // Carrito de compras
 let carrito = [];
 let totalCarrito = 0;
