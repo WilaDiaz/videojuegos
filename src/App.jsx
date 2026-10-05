@@ -19,7 +19,7 @@ function App() {
     setError('')
 
     try {
-      const respuesta = await fetch('/data/productos.json')
+      const respuesta = await fetch(`${import.meta.env.BASE_URL}data/productos.json`)
 
       if (!respuesta.ok) {
         throw new Error('No fue posible cargar los productos.')
@@ -159,9 +159,8 @@ function App() {
                 return (
                   <article className="producto-card" key={producto.id}>
                     <img
-                      src={producto.imagen}
+                      src={`${import.meta.env.BASE_URL}${producto.imagen.replace(/^\//, '')}`}
                       alt={producto.nombre}
-                      className="producto-imagen"
                     />
 
                     <div className="producto-info">
