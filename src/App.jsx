@@ -1,42 +1,70 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react"
+import "./App.css"
+
+import Navbar from "./components/Navbar"
+import Buscador from "./components/Buscador"
+import Catalogo from "./components/Catalogo"
+import Carrito from "./components/Carrito"
+import FormularioContacto from "./components/FormularioContacto"
 
 function App() {
   // Estados principales de la aplicación
   const [productos, setProductos] = useState([])
-  const [carrito, setCarrito] = useState([])
-  const [busqueda, setBusqueda] = useState('')
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
 
-  // Carga los productos desde el archivo JSON al iniciar la aplicación
+  // Recupera el carrito guardado en el navegador
+  const [carrito, setCarrito] = useState(() => {
+    try {
+      const carritoGuardado = localStorage.getItem("dcgeek-carrito")
+      return carritoGuardado ? JSON.parse(carritoGuardado) : []
+    } catch {
+      return []
+    }
+  })
+
+  const [busqueda, setBusqueda] = useState("")
+  const [categoria, setCategoria] = useState("Todas")
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState("")
+
+  // Carga los productos desde el archivo JSON
   useEffect(() => {
     cargarProductos()
   }, [])
 
+  // Guarda el carrito en el navegador cada vez que cambia
+  useEffect(() => {
+    localStorage.setItem(
+      "dcgeek-carrito",
+      JSON.stringify(carrito)
+    )
+  }, [carrito])
+
   const cargarProductos = async () => {
     setCargando(true)
-    setError('')
+    setError("")
 
     try {
-      const respuesta = await fetch(`${import.meta.env.BASE_URL}data/productos.json`)
+      const respuesta = await fetch(
+        `${import.meta.env.BASE_URL}data/productos.json`
+      )
 
       if (!respuesta.ok) {
-        throw new Error('No fue posible cargar los productos.')
+        throw new Error("No fue posible cargar los productos.")
       }
 
       const datos = await respuesta.json()
 
-      // Validación básica de la información recibida
+      // Valida que la respuesta sea un arreglo
       if (!Array.isArray(datos)) {
-        throw new Error('El formato de los productos no es válido.')
+        throw new Error("El formato de los productos no es válido.")
       }
 
       setProductos(datos)
     } catch (errorCarga) {
-      console.error('Error al cargar productos:', errorCarga)
+      console.error("Error al cargar productos:", errorCarga)
+
       setError(
-        'No pudimos cargar los productos. Puedes intentarlo nuevamente.'
+        "No pudimos cargar los productos. Puedes intentarlo nuevamente."
       )
     } finally {
       setCargando(false)
@@ -56,7 +84,9 @@ function App() {
 
   // Elimina un producto del carrito
   const eliminarDelCarrito = (id) => {
-    setCarrito(carrito.filter((producto) => producto.id !== id))
+    setCarrito(
+      carrito.filter((producto) => producto.id !== id)
+    )
   }
 
   // Vacía completamente el carrito
@@ -64,10 +94,22 @@ function App() {
     setCarrito([])
   }
 
-  // Filtra el catálogo según la búsqueda
-  const productosFiltrados = productos.filter((producto) =>
-    producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  )
+  // Permite saber si un producto ya está agregado
+  const estaEnCarrito = (id) =>
+    carrito.some((producto) => producto.id === id)
+
+  // Filtra por nombre y categoría
+  const productosFiltrados = productos.filter((producto) => {
+    const coincideBusqueda = producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+
+    const coincideCategoria =
+      categoria === "Todas" ||
+      producto.categoria === categoria
+
+    return coincideBusqueda && coincideCategoria
+  })
 
   // Calcula el precio total del carrito
   const totalCarrito = carrito.reduce(
@@ -75,19 +117,18 @@ function App() {
     0
   )
 
-  // Permite saber si un producto ya está agregado
-  const estaEnCarrito = (id) =>
-    carrito.some((producto) => producto.id === id)
-
+  // Formatea los precios en pesos chilenos
   const formatearPrecio = (precio) =>
-    precio.toLocaleString('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
+    precio.toLocaleString("es-CL", {
+      style: "currency",
+      currency: "CLP",
     })
 
   return (
     <div className="app">
-      <header className="encabezado">
+      <Navbar />
+
+      <header id="inicio" className="encabezado">
         <div className="container">
           <h1>DCgeek</h1>
           <p>Tu tienda de videojuegos</p>
@@ -95,7 +136,7 @@ function App() {
       </header>
 
       <main className="container contenido-principal">
-        <section className="catalogo">
+        <section id="catalogo" className="catalogo">
           <div className="titulo-seccion">
             <div>
               <h2>Catálogo de videojuegos</h2>
@@ -107,17 +148,12 @@ function App() {
             </span>
           </div>
 
-          <div className="buscador">
-            <label htmlFor="busqueda">Buscar videojuego</label>
-
-            <input
-              id="busqueda"
-              type="search"
-              placeholder="Ej: Hogwarts Legacy"
-              value={busqueda}
-              onChange={(evento) => setBusqueda(evento.target.value)}
-            />
-          </div>
+          <Buscador
+            busqueda={busqueda}
+            setBusqueda={setBusqueda}
+            categoria={categoria}
+            setCategoria={setCategoria}
+          />
 
           {cargando && (
             <div className="mensaje estado-carga">
@@ -132,7 +168,7 @@ function App() {
 
               <button
                 type="button"
-                className="btn-reintentar"
+                className="btn btn-danger"
                 onClick={cargarProductos}
               >
                 Reintentar
@@ -140,133 +176,28 @@ function App() {
             </div>
           )}
 
-          {!cargando &&
-            !error &&
-            productosFiltrados.length === 0 && (
-              <div className="mensaje">
-                <p>
-                  No encontramos productos que coincidan con tu búsqueda.
-                </p>
-                <p>Prueba utilizando otro nombre.</p>
-              </div>
-            )}
-
-          {!cargando && !error && productosFiltrados.length > 0 && (
-            <div className="grid-productos">
-              {productosFiltrados.map((producto) => {
-                const agregado = estaEnCarrito(producto.id)
-
-                return (
-                  <article className="producto-card" key={producto.id}>
-                    <img
-                      src={`${import.meta.env.BASE_URL}${producto.imagen.replace(/^\//, '')}`}
-                      alt={producto.nombre}
-                    />
-
-                    <div className="producto-info">
-                      <h3>{producto.nombre}</h3>
-
-                      <p className="descripcion">
-                        {producto.descripcion}
-                      </p>
-
-                      <div className="precios">
-                        <span className="precio-original">
-                          {formatearPrecio(producto.precio)}
-                        </span>
-
-                        <span className="precio-oferta">
-                          {formatearPrecio(producto.oferta)}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        className={
-                          agregado
-                            ? 'btn-producto agregado'
-                            : 'btn-producto'
-                        }
-                        onClick={() => agregarAlCarrito(producto)}
-                        disabled={agregado}
-                      >
-                        {agregado
-                          ? '✓ En el carrito'
-                          : 'Agregar al carrito'}
-                      </button>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
+          {!cargando && !error && (
+            <Catalogo
+              productos={productosFiltrados}
+              agregarAlCarrito={agregarAlCarrito}
+              estaEnCarrito={estaEnCarrito}
+              formatearPrecio={formatearPrecio}
+            />
           )}
         </section>
 
-        <aside className="carrito">
-          <h2>Carrito de compras</h2>
-
-          {carrito.length === 0 ? (
-            <div className="carrito-vacio">
-              <p>🛒</p>
-              <p>Tu carrito está vacío.</p>
-              <small>
-                Agrega un videojuego para comenzar tu compra.
-              </small>
-            </div>
-          ) : (
-            <>
-              <div className="lista-carrito">
-                {carrito.map((producto) => (
-                  <div
-                    className="item-carrito"
-                    key={producto.id}
-                  >
-                    <div>
-                      <strong>{producto.nombre}</strong>
-                      <span>
-                        {formatearPrecio(producto.oferta)}
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="btn-eliminar"
-                      onClick={() =>
-                        eliminarDelCarrito(producto.id)
-                      }
-                      aria-label={`Eliminar ${producto.nombre}`}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="resumen-carrito">
-                <div>
-                  <span>Productos:</span>
-                  <strong>{carrito.length}</strong>
-                </div>
-
-                <div className="total">
-                  <span>Total:</span>
-                  <strong>
-                    {formatearPrecio(totalCarrito)}
-                  </strong>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-vaciar"
-                  onClick={vaciarCarrito}
-                >
-                  Vaciar carrito
-                </button>
-              </div>
-            </>
-          )}
-        </aside>
+        <div className="carrito">
+          <Carrito
+            carrito={carrito}
+            eliminarDelCarrito={eliminarDelCarrito}
+            vaciarCarrito={vaciarCarrito}
+            totalCarrito={totalCarrito}
+            formatearPrecio={formatearPrecio}
+          />
+        </div>
       </main>
+
+      <FormularioContacto />
 
       <footer>
         <p>DCgeek © 2026 - Desarrollo Frontend I</p>
