@@ -5,7 +5,8 @@
     "precio": 49990,
     "oferta": 39990,
     "descripcion": "Vive una aventura mágica en el mundo de Hogwarts y descubre todos sus secretos.",
-    "imagen": "/img/harrypotter.avif"
+    "imagen": "img/harrypotter.avif",
+    "categoria": "Aventura"
   },
   {
     "id": 2,
@@ -13,7 +14,8 @@
     "precio": 29990,
     "oferta": 19990,
     "descripcion": "Crea personajes, construye hogares y disfruta de infinitas posibilidades en Los Sims 4.",
-    "imagen": "/img/lossims.jpg"
+    "imagen": "img/lossims.jpg",
+    "categoria": "Simulación"
   },
   {
     "id": 3,
@@ -21,6 +23,7 @@
     "precio": 45990,
     "oferta": 35990,
     "descripcion": "Disfruta de intensos combates y enfrenta a los luchadores más emblemáticos de Mortal Kombat.",
-    "imagen": "/img/mortalkombat.avif"
+    "imagen": "img/mortalkombat.avif",
+    "categoria": "Lucha"
   }
 ]
